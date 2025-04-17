@@ -15,7 +15,7 @@ class GraphEnv(gym.Env):
         self.node_to_index = {node: i for i, node in enumerate(self.nodes)}
         self.done = False
         self.visited_nodes = []
-        self.action_space = spaces.Discrete(3)
+        self.action_space = spaces.Discrete(3)  
         self.reward = 0
         self.steps_taken = 0
 
@@ -32,9 +32,19 @@ class GraphEnv(gym.Env):
         Updates the agent's state by moving to the next node, checks if the goal is reached, 
         assigns rewards or penalties based on movement, and returns the updated state and reward.
         """     
-        # Moving to nearest node
+        # Determing the neighbours of the current nodes
         neighbors = list(self.map.neighbors(self.current_node))
         neighbors = sorted(neighbors, key=lambda n: (self.map.nodes[n]['y'], self.map.nodes[n]['x']))
+
+        # Mapping the action to a specific neighbour
+        if action == 0:  
+            next_node = neighbors[0]
+        elif action == 1:  
+            next_node = neighbors[1] if len(neighbors) > 1 else neighbors[0]
+        elif action == 2:  
+            next_node = neighbors[2] if len(neighbors) > 2 else neighbors[0]
+        
+        # Making a move based on the defined actions 
         next_node = neighbors[action % len(neighbors)]
         self.previous_node = self.current_node
         self.current_node = next_node
