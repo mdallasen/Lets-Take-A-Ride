@@ -1,6 +1,9 @@
 import tensorflow as tf 
 from tensorflow.keras import layers
 
+# THINGS TO DO: 
+    # Make this more complex
+
 class DQN(tf.keras.Model):
     def __init__(self, state_size, action_size): 
         self.state_size = state_size

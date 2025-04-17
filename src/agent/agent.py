@@ -6,6 +6,11 @@ import networkx as nx
 import osmnx as ox 
 from utils import edistance
 
+# THINGS TO DO: 
+    # Edges are treated equally, need to assign a higher weight the longer they are
+    # We don't account for edge characteristics e.g. highway vs road vs inaccesible road, need to create a list of valid neighbours
+    # Need to improve the reward structure within steps to account for more complex scenarios and distance away
+
 class GraphEnv(gym.Env):
     def __init__(self, map):
         super(GraphEnv, self).__init__() 

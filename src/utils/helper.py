@@ -1,5 +1,8 @@
 import math
 
+# THINGS TO DO: 
+    # Add any helper funcitons you use here (DON'T DELETE OR ALTER ANY OTHERS)
+
 def edistance(start, end, map): 
 
     start_lat, start_long = map.nodes[start['y']], map.nodes[start['x']]
