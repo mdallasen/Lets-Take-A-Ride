@@ -4,7 +4,7 @@ import numpy as np
 import random 
 import networkx as nx 
 import osmnx as ox 
-from utils import edistance
+from utils.helper import edistance
 
 # THINGS TO DO: 
     # Edges are treated equally, need to assign a higher weight the longer they are
@@ -23,6 +23,7 @@ class GraphEnv(gym.Env):
         self.action_space = spaces.Discrete(3)  
         self.reward = 0
         self.steps_taken = 0
+        self.state_space = len(self.nodes)
 
     def reset(self):
         """
@@ -30,7 +31,7 @@ class GraphEnv(gym.Env):
         """
         self.current_node = random.choice(list(self.map.nodes()))
         node_index = self.node_to_index[self.current_node]
-        return node_index
+        return node_index, {}
     
     def step(self, action):
         """
@@ -50,7 +51,9 @@ class GraphEnv(gym.Env):
             next_node = neighbors[2] if len(neighbors) > 2 else neighbors[0]
         
         # Making a move based on the defined actions 
+        current_distance = edistance(self.current_node, self.goal_node, self.map)
         next_node = neighbors[action % len(neighbors)]
+        next_distance = edistance(next_node, self.goal_node, self.map)
         self.previous_node = self.current_node
         self.current_node = next_node
         self.visited_nodes.append(next_node)
@@ -58,28 +61,18 @@ class GraphEnv(gym.Env):
         # Checking if reached end goal yet
         self.done = self.current_node == self.goal_node
         if self.done:
-            self.reward += 1000
+            self.reward = 1000
         else:
-            self.reward -= 1000
-
-        # Calculating distance from end goal
-        current_distance = edistance(self.current_node, self.goal_node, self.map)
-        next_distance = edistance(next_node, self.goal_node, self.map)
+            self.reward = -1
 
         # Checking if moving towards goal        
         if next_distance > current_distance:
             self.reward -= 5 
         self.steps_taken += 1
 
-        return self.node_to_index[self.current_node], self.reward, self.done, {}
-    
-    def render(self, graph = True): 
-        """
-        Prints the current node and optionally displays the path taken by the agent on the map.
-        """
-        print(self.current_node)
-        if graph: 
-            ox.plot_graph_route(self.map, self.visited_nodes)
+        terminated = self.done
+        truncated = False 
+        return self.node_to_index[self.current_node], self.reward, terminated, truncated, {}
 
     
         
