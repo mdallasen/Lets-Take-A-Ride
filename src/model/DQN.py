@@ -2,7 +2,8 @@ import tensorflow as tf
 from tensorflow.keras import layers
 
 # THINGS TO DO: 
-    # Make this more complex
+    # Make this more complex as needed 
+    # Add more models e.g. actor critic in the model folder as needed 
 
 class DQN(tf.keras.Model):
     def __init__(self, state_size, num_actions): 

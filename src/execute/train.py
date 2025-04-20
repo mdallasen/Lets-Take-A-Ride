@@ -6,8 +6,7 @@ import tensorflow as tf
 from model import DQN
 
 # THINGS TO DO: 
-    # Develop the training across episodes
-    # Storing experiences in the buffer 
+    # Check if functions work properly and with our data / custom env 
 
 def train_episode(env, model, batch_size, memory, epsilon=.1):
 
