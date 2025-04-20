@@ -2,6 +2,7 @@ import math
 
 # THINGS TO DO: 
     # Add any helper funcitons you use here (DON'T DELETE OR ALTER ANY OTHERS)
+    # Change to manhattan distance ???? 
 
 def edistance(start, end, map): 
 

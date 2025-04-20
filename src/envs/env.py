@@ -7,6 +7,8 @@ import osmnx as ox
 from utils.helper import edistance
 
 # THINGS TO DO: 
+    # Better define the action space r.e. nodes 
+    # Need to confirm that our custom environment is set up properly!!!!!! 
     # Edges are treated equally, need to assign a higher weight the longer they are
     # We don't account for edge characteristics e.g. highway vs road vs inaccesible road, need to create a list of valid neighbours
     # Need to improve the reward structure within steps to account for more complex scenarios and distance away
