@@ -14,13 +14,13 @@ class DQN(tf.keras.Model):
             [
                 tf.keras.layers.Dense(64, activation = 'relu', input_shape = (state_size,)),
                 tf.keras.layers.Dense(32, activation = 'relu'), 
-                tf.keras.layers.Dense(num_actions, activations = None)  
+                tf.keras.layers.Dense(num_actions, activation = None)  
             ]
         )
 
-        self.model.optimizer = tf.keras.optimizer.Adam(learning_rate = 0.001) 
+        self.optimizer = tf.keras.optimizer.Adam(learning_rate = 0.001) 
         self.model.build(input_shape = (None, state_size))
-        self.target_model = tf.keras.models.clone_modle(self.model)
+        self.target_model = tf.keras.models.clone_model(self.model)
         self.target_model.set_weights(self.model.get_weights())
 
     def call(self, states): 
