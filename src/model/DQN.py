@@ -18,7 +18,7 @@ class DQN(tf.keras.Model):
             ]
         )
 
-        self.optimizer = tf.keras.optimizer.Adam(learning_rate = 0.001) 
+        self.optimizer = tf.keras.optimizers.Adam(learning_rate = 0.001) 
         self.model.build(input_shape = (None, state_size))
         self.target_model = tf.keras.models.clone_model(self.model)
         self.target_model.set_weights(self.model.get_weights())

@@ -75,6 +75,3 @@ class GraphEnv(gym.Env):
         terminated = self.done
         truncated = False 
         return self.node_to_index[self.current_node], self.reward, terminated, truncated, {}
-
-    
-        
