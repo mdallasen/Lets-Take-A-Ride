@@ -89,23 +89,23 @@ def train(env, model, memory = None, epsilon=.1):
     else:
         raise ValueError("Unsupported model type.")
 
-map = oms_data()
-env = DummyGraphEnv(map)
-state_size = len(env.nodes)
+# map = oms_data()
+# env = DummyGraphEnv(map)
+# state_size = len(env.nodes)
 
-num_actions = env.action_space.n
-model = DQN(state_size, num_actions)
+# num_actions = env.action_space.n
+# model = DQN(state_size, num_actions)
 
-totalReward = []
-num_episodes = 2
-memory=None
+# totalReward = []
+# num_episodes = 2
+# memory=None
 
-for episode in tqdm(range(num_episodes), desc="Training Progress", unit="episode"):
-    print(episode, end = "\r")
-    reward, memory = train(env, model, memory=memory, epsilon = 1-episode/num_episodes)
+# for episode in tqdm(range(num_episodes), desc="Training Progress", unit="episode"):
+#     print(episode, end = "\r")
+#     reward, memory = train(env, model, memory=memory, epsilon = 1-episode/num_episodes)
 
-    if episode in range(0, num_episodes):
-        totalReward.append(reward)
-    env.close()
+#     if episode in range(0, num_episodes):
+#         totalReward.append(reward)
+#     env.close()
 
-print(sum(totalReward)/len(totalReward))  
+# print(sum(totalReward)/len(totalReward))  
