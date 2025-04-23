@@ -7,13 +7,14 @@ from tensorflow.keras import layers
 
 class DQN(tf.keras.Model):
     def __init__(self, state_size, num_actions): 
+        super(DQN, self).__init__()
         self.state_size = state_size
         self.num_actions = num_actions
         
         self.model = tf.keras.Sequential(
             [
-                tf.keras.layers.Dense(64, activation = 'relu', input_shape = (state_size,)),
-                tf.keras.layers.Dense(32, activation = 'relu'), 
+                tf.keras.Input(shape=(state_size,)),
+                tf.keras.layers.Dense(64, activation='relu'),
                 tf.keras.layers.Dense(num_actions, activation = None)  
             ]
         )
@@ -25,7 +26,7 @@ class DQN(tf.keras.Model):
 
     def call(self, states): 
         
-        self.model(states)
+        return self.model(states)
 
     def loss_func(self, batch, discount_factor = 0.99): 
 
@@ -35,7 +36,7 @@ class DQN(tf.keras.Model):
         actions = tf.convert_to_tensor(actions, dtype=tf.int32)
         rewards = tf.convert_to_tensor(rewards, dtype=tf.float32)
         next_states = tf.convert_to_tensor(next_states, dtype=tf.float32)
-        done = tf.convert_to_tensor(done, dtype=tf.float32)
+        done = tf.cast(done, dtype=tf.float32)
 
         q_s = self(states)
         q_s_a = tf.reduce_sum(q_s * tf.one_hot(actions, self.num_actions), axis=1)

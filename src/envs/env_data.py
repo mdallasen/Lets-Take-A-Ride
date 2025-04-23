@@ -10,7 +10,8 @@ def oms_data(show_graph = False):
     data_folder = os.path.join(os.getcwd(), "data")
     cache_folder = os.path.join(os.getcwd(), "data")
     ox.config(log_console=True, use_cache=True, data_folder=data_folder, cache_folder=cache_folder)
-    map = ox.graph_from_place('Manhattan, New York, USA', network_type='drive_service')
+    place_name = 'Manhattan, New York, USA'
+    map = ox.graph_from_place(place_name, network_type='drive_service')
     # nodes, edges = ox.graph_to_gdfs(map)
     
     # node_features = nodes[['y', 'x', 'highway', 'street_count', 'ref']]
@@ -18,7 +19,11 @@ def oms_data(show_graph = False):
        # 'lanes', 'service', 'access', 'bridge', 'tunnel',
        # 'width', 'junction']]
     
-    if show_graph: 
-        ox.plot_graph(map)
+    nodes, edges = ox.graph_to_gdfs(map)
+    sample_nodes = nodes.head(20)
+    subgraph = map.subgraph(sample_nodes.index)
 
-    return map
+    if show_graph: 
+        ox.plot_graph(subgraph)
+
+    return subgraph

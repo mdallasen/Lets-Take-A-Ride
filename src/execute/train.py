@@ -6,26 +6,28 @@ import tensorflow as tf
 from src.envs.dummy_env import DummyGraphEnv
 from src.model.DQN import DQN
 from src.envs.env_data import oms_data
+from tqdm import tqdm
 
 # THINGS TO DO: 
     # Check if functions work properly and with our data / custom env 
 
 # python -m src.execute.train 
 
-def train_episode(env, model, batch_size, memory, epsilon=.1):
+def train_episode(env, model, batch_size, memory, epsilon=.1, max_steps=100):
 
     # train_model for one episode
     state = env.reset()[0]
     done = False
     ep_rwd = []
-    num_batches = 10
+    num_batches = 2
+    step_count = 0
 
     # e greedy approach to selecting action
-    while not done: 
+    while not done and step_count < max_steps:
         if np.random.rand() < epsilon:
             action = env.action_space.sample()
         else: 
-            q_values = model(np.expand_dims(state, axis=0))
+            q_values = model(tf.one_hot([state], depth=env.state_space, dtype=tf.float32))
             action = np.argmax(q_values[0].numpy())
 
         # determine the rewards, next state etc. from that action
@@ -34,6 +36,7 @@ def train_episode(env, model, batch_size, memory, epsilon=.1):
         ep_rwd.append(reward)
         memory.append((state, action, reward, next_state, done))
         state = next_state
+        step_count += 1 
 
         # for each data point in the batch, compute the states, actions and rewards and determine the loss, then back prop
         if len(memory) > batch_size:
@@ -42,7 +45,8 @@ def train_episode(env, model, batch_size, memory, epsilon=.1):
                 batch = [memory[i] for i in indices]
                 states, actions, rewards, next_states, dones = zip(*batch)
                 
-                states = tf.convert_to_tensor(np.array(states), dtype=tf.float32)
+                states = tf.one_hot(states, depth=env.state_space, dtype=tf.float32)         # (32, 6572)
+                next_states = tf.one_hot(next_states, depth=env.state_space, dtype=tf.float32)
                 next_states = tf.convert_to_tensor(np.array(next_states), dtype=tf.float32)
                 actions = tf.convert_to_tensor(actions, dtype=tf.int32)
                 rewards = tf.convert_to_tensor(rewards, dtype=tf.float32)
@@ -64,7 +68,7 @@ def train(env, model, memory = None, epsilon=.1):
 
         if memory is None:
             memory = []
-            while len(memory) < 25:
+            while len(memory) < 1:
                 state = env.reset()[0]
                 ep_memory = []
                 for i in range(50): 
@@ -78,18 +82,30 @@ def train(env, model, memory = None, epsilon=.1):
                 memory.extend(ep_memory)
 
         memory = memory[-1000:]
-        total_r, memory = train_episode(env, model, batch_size=32, memory=memory, epsilon=epsilon)
+        total_r, memory = train_episode(env, model, batch_size=5, memory=memory, epsilon=epsilon)
         
         return total_r, memory
 
     else:
         raise ValueError("Unsupported model type.")
-    
+
 map = oms_data()
 env = DummyGraphEnv(map)
-state_size = 2
-model = DQN(state_size, env.action_space.n)
-reward_sum, updated_memory = train(env, model, memory=[], epsilon=0.2)
+state_size = len(env.nodes)
 
-print(f"Total reward: {reward_sum}")
-print(f"Memory length: {len(updated_memory)}")
+num_actions = env.action_space.n
+model = DQN(state_size, num_actions)
+
+totalReward = []
+num_episodes = 2
+memory=None
+
+for episode in tqdm(range(num_episodes), desc="Training Progress", unit="episode"):
+    print(episode, end = "\r")
+    reward, memory = train(env, model, memory=memory, epsilon = 1-episode/num_episodes)
+
+    if episode in range(0, num_episodes):
+        totalReward.append(reward)
+    env.close()
+
+print(sum(totalReward)/len(totalReward))  
