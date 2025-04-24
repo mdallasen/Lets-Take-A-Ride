@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import random
-import gym
+import gymnasium as gym
 import networkx as nx
 
 class DummyGraphEnv(gym.Env):
