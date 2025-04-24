@@ -5,6 +5,8 @@ from execute.inference import visualize_data, visualize_episode
 from envs.env_data import oms_data
 from envs.env import GraphEnv
 
+
+
 # THINGS TO DO: 
     # Complete this when all other functions are done
     # Add in the visualisation from inference here 
@@ -15,13 +17,14 @@ def main():
         print("USAGE: python main.py <Model Type>")
         exit()
     if len(sys.argv) == 2: 
-        map = oms_data
+        map = oms_data(True)
         env = GraphEnv(map) 
     
     state_size = env.state_space
     print("State Size: ", state_size)
-    state_size = state_size[0]
-    num_actions = env.action_space
+    #state_size = state_size[0]
+    num_actions = env.action_space.n
+    print('number lllllll',num_actions)
 
     if sys.argv[1] == "DQN":
         model = DQN(state_size, num_actions)

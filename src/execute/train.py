@@ -3,9 +3,9 @@ import sys
 import gymnasium as gym
 import numpy as np
 import tensorflow as tf
-from src.envs.dummy_env import DummyGraphEnv
-from src.model.DQN import DQN
-from src.envs.env_data import oms_data
+from envs.dummy_env import DummyGraphEnv
+from model.DQN import DQN
+from envs.env_data import oms_data
 from tqdm import tqdm
 
 # THINGS TO DO: 
