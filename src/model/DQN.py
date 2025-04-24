@@ -1,10 +1,6 @@
 import tensorflow as tf 
 from tensorflow.keras import layers
 
-# THINGS TO DO: 
-    # Make this more complex as needed 
-    # Add more models e.g. actor critic in the model folder as needed 
-
 class DQN(tf.keras.Model):
     def __init__(self, state_size, num_actions): 
         super(DQN, self).__init__()
@@ -25,10 +21,9 @@ class DQN(tf.keras.Model):
         self.target_model.set_weights(self.model.get_weights())
 
     def call(self, states): 
-        if tf.rank(states) == 1:            # shape (state_size,)
-            states = tf.expand_dims(states, 0)  # shape (1, state_size)
+        if tf.rank(states) == 1:           
+            states = tf.expand_dims(states, 0)  
         return self.model(states)
-        
 
     def loss_func(self, batch, discount_factor = 0.99): 
 

@@ -4,9 +4,6 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import osmnx as ox 
 
-# THINGS TO DO: 
-    # Complete functions for visualisation
-
 def visualize_episode(model, env=None):
     """
     Runs one episode using the trained model and visualizes the path on the graph.

@@ -3,15 +3,9 @@ import sys
 import gymnasium as gym
 import numpy as np
 import tensorflow as tf
-from envs.dummy_env import DummyGraphEnv
+from envs.env import GraphEnv
 from model.DQN import DQN
 from envs.env_data import oms_data
-from tqdm import tqdm
-
-# THINGS TO DO: 
-    # Check if functions work properly and with our data / custom env 
-
-# python -m src.execute.train 
 
 def train_episode(env, model, batch_size, memory, epsilon=.1, max_steps=100):
 
@@ -88,24 +82,3 @@ def train(env, model, memory = None, epsilon=.1):
 
     else:
         raise ValueError("Unsupported model type.")
-
-# map = oms_data()
-# env = DummyGraphEnv(map)
-# state_size = len(env.nodes)
-
-# num_actions = env.action_space.n
-# model = DQN(state_size, num_actions)
-
-# totalReward = []
-# num_episodes = 2
-# memory=None
-
-# for episode in tqdm(range(num_episodes), desc="Training Progress", unit="episode"):
-#     print(episode, end = "\r")
-#     reward, memory = train(env, model, memory=memory, epsilon = 1-episode/num_episodes)
-
-#     if episode in range(0, num_episodes):
-#         totalReward.append(reward)
-#     env.close()
-
-# print(sum(totalReward)/len(totalReward))  
