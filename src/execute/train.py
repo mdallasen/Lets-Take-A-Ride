@@ -7,17 +7,16 @@ from envs.env import GraphEnv
 from model.DQN import DQN
 from envs.env_data import oms_data
 
-def train_episode(env, model, batch_size, memory, epsilon=.1, max_steps=100):
+def train_episode(env, model, batch_size, memory, epsilon=.1):
 
     # train_model for one episode
     state = env.reset()[0]
     done = False
     ep_rwd = []
     num_batches = 2
-    step_count = 0
 
     # e greedy approach to selecting action
-    while not done and step_count < max_steps:
+    while not done:
         if np.random.rand() < epsilon:
             action = env.action_space.sample()
         else: 
@@ -30,7 +29,6 @@ def train_episode(env, model, batch_size, memory, epsilon=.1, max_steps=100):
         ep_rwd.append(reward)
         memory.append((state, action, reward, next_state, done))
         state = next_state
-        step_count += 1 
 
         # for each data point in the batch, compute the states, actions and rewards and determine the loss, then back prop
         if len(memory) > batch_size:

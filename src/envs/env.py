@@ -25,7 +25,6 @@ class GraphEnv(gym.Env):
         self.done = False
         self.reward = 0.0
         self.state_space = len(self.nodes)
-        print('djfkdjdfkdjfkd',self.state_space)
 
     def reset(self, *, seed=None, options=None):
         super().reset(seed=seed)
