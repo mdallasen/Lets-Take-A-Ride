@@ -1,11 +1,7 @@
-import os
-import sys
-import gymnasium as gym
 import numpy as np
 import tensorflow as tf
-from envs.env import GraphEnv
 from model.DQN import DQN
-from envs.env_data import oms_data
+from utils.helper import encode_state
 
 def train_episode(env, model, batch_size, memory, epsilon=.1):
 
