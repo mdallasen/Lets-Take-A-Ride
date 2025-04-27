@@ -7,7 +7,7 @@ from envs.env import GraphEnv
 from execute.test_model import evaluate_model
 
 def main(): 
-    map = oms_data()
+    map = oms_data(True)
     env = GraphEnv(map)
     state_size = len(env.nodes)
 
@@ -34,7 +34,6 @@ def main():
     visual_gif(model, env, gif_path="my_trip.gif")
     visualize_data(totalReward)
     
-
 
 
 if __name__ == "__main__": 

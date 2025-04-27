@@ -9,8 +9,6 @@ import os
 import shutil
 from PIL import Image
 
-
-
 def visualize_trip(model, env=None, node_size=10):
     """
     Visualizes a full trip from start to goal using the trained model.
@@ -20,7 +18,6 @@ def visualize_trip(model, env=None, node_size=10):
         env = GraphEnv()
 
     state = env.reset()[0]
-
 
     done = False
     visited = [env.current_node]
@@ -40,7 +37,6 @@ def visualize_trip(model, env=None, node_size=10):
         action = np.argmax(q_values[0].numpy())
         check = True
 
-
         if env.done:
             break
 
@@ -53,7 +49,6 @@ def visualize_trip(model, env=None, node_size=10):
         total_distance += ((x2 - x1)**2 + (y2 - y1)**2)**0.5
 
         state = next_state
-        
 
     pos = {node: (env.map.nodes[node]['x'], env.map.nodes[node]['y']) for node in env.map.nodes}
 
@@ -197,8 +192,6 @@ def visual_gif(model, env=None, node_size=10, gif_path="trip.gif", max_frames=50
     frames[0].save(gif_path, format='GIF', save_all=True, append_images=frames[1:], duration=300, loop=0)
     print(f"GIF saved to {gif_path}")
     shutil.rmtree(frame_dir)
-
-
 
 def visualize_data(total_rewards):
     """
