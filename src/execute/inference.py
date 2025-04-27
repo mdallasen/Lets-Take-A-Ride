@@ -98,7 +98,7 @@ def visualize_trip(model, env=None, node_size=10):
     plt.tight_layout()
     plt.show()
 
-def visual_gif(model, env=None, node_size=10, gif_path="trip.gif", max_frames=20):
+def visual_gif(model, env=None, node_size=10, gif_path="trip.gif", max_frames=50):
     """
     Visualizes a trip and saves it to a GIF with at most max_frames frames.
     """
