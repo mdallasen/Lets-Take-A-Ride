@@ -7,13 +7,17 @@ class DQN(tf.keras.Model):
         self.state_size = state_size
         self.num_actions = num_actions
         
-        self.model = tf.keras.Sequential(
-            [
-                tf.keras.Input(shape=(state_size,)),
-                tf.keras.layers.Dense(64, activation='relu'),
-                tf.keras.layers.Dense(num_actions, activation = None)  
-            ]
-        )
+        self.model = tf.keras.Sequential([
+            tf.keras.Input(shape=(state_size,)),
+            
+            tf.keras.layers.Dense(256, activation='relu'),
+            tf.keras.layers.Dense(256, activation='relu'),
+            
+            tf.keras.layers.Dense(128, activation='relu'),
+            tf.keras.layers.Dense(64, activation='relu'),
+
+            tf.keras.layers.Dense(num_actions, activation=None)  # No activation on Q-values
+        ])
 
         self.optimizer = tf.keras.optimizers.Adam(learning_rate = 0.001) 
         self.model.build(input_shape = (None, state_size))

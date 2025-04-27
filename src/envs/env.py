@@ -31,6 +31,8 @@ class GraphEnv(gym.Env):
 
         self.goal_node = random.choice(self.nodes)
         self.current_node = random.choice(self.nodes)
+
+        # self.observations = {goal_node, current_node}
         self.steps_taken = 0
         self.done = False
         self.reward = 0.0

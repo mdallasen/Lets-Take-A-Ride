@@ -14,7 +14,7 @@ def main():
     model = DQN(state_size, num_actions)
 
     totalReward = []
-    num_episodes = 100
+    num_episodes = 10
     memory=None
 
     for episode in range(num_episodes):
@@ -30,7 +30,6 @@ def main():
     visualize_trip(model, env)
     visual_gif(model, env, gif_path="my_trip.gif")
     visualize_data(totalReward)
-
 
 if __name__ == "__main__": 
     main()

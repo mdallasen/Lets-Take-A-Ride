@@ -14,7 +14,6 @@ class ActorCritic(tf.keras.Model):
             layers.Dense(32, activation='relu'),
             layers.Dense(num_actions, activation='softmax')
         ])
-
        
         self.critic = tf.keras.Sequential([
             layers.Input(shape=(state_size,)),
