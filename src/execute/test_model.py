@@ -1,6 +1,7 @@
 import numpy as np
 import tensorflow as tf
 from utils.helper import edistance
+from execute.inference import visualize_data, visualize_trip, visual_gif
 
 def evaluate_model(env, model, num_tests=20, max_steps=50):
     """
@@ -16,6 +17,7 @@ def evaluate_model(env, model, num_tests=20, max_steps=50):
     step_efficiencies = []
     closer_step_percentages = []
     final_distances_failed = []
+    working = False
 
     for test_idx in range(num_tests):
         state = env.reset()[0]
@@ -83,6 +85,12 @@ def evaluate_model(env, model, num_tests=20, max_steps=50):
 
         if env.current_node in goal_nodes:
             success_count += 1
+
+            if working is False:
+                visualize_trip(model, env)
+                visual_gif(model, env, gif_path="my_trip.gif")
+                working = True
+                
 
         print(f"Test {test_idx+1}: Reward={cumulative_reward:.2f}, Distance={total_distance:.4f}, Steps={steps}, Success={env.current_node in goal_nodes}")
 
