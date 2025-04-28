@@ -10,17 +10,11 @@ class GraphEnv(gym.Env):
 
     def __init__(self, graph: nx.Graph, max_steps: int = 500):
         super().__init__()
-
         self.map = graph
         self.nodes = list(graph.nodes())
         self.node_to_index = {n: i for i, n in enumerate(self.nodes)}
-
         self.action_space = spaces.Discrete(3)             
-        self.observation_space = spaces.Discrete(len(self.nodes))
-
         self.max_steps = max_steps
-        self.current_node = None
-        self.goal_node = None
         self.steps_taken = 0
         self.done = False
         self.reward = 0.0
@@ -28,11 +22,14 @@ class GraphEnv(gym.Env):
 
     def reset(self, *, seed=None, options=None):
         super().reset(seed=seed)
-
-        self.goal_node = random.choice(self.nodes)
+        
+        if not hasattr(self, 'goal_node'):
+            self.goal_node = random.choice(self.nodes)
+        
+        if self.goal_node not in self.map.nodes:
+            raise ValueError(f"goal_node {self.goal_node} is not in the map!")
+        
         self.current_node = random.choice(self.nodes)
-
-        # self.observations = {goal_node, current_node}
         self.steps_taken = 0
         self.done = False
         self.reward = 0.0

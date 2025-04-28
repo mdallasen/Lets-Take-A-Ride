@@ -8,7 +8,7 @@ def train_episode(env, model, batch_size, memory, epsilon=.1):
     state = env.reset()[0]
     done = False
     ep_rwd = []
-    num_batches = 2
+    num_batches = 10
 
     # e greedy approach to selecting action
     while not done:
