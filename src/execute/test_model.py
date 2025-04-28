@@ -33,8 +33,11 @@ def evaluate_model(env, model, num_tests=20, max_steps=500):
         goal_node = env.goal_node
 
         while not done and steps < max_steps:
-            # Model chooses action
-            state_tensor = tf.one_hot([state], depth=env.state_space, dtype=tf.float32)
+            state_tensor = tf.concat([
+                tf.one_hot([state[0]], depth=env.state_space, dtype=tf.float32),
+                tf.one_hot([state[1]], depth=env.state_space, dtype=tf.float32)
+            ], axis=-1)
+
             q_values = model(state_tensor)
             action = np.argmax(q_values[0].numpy())
 
@@ -52,32 +55,25 @@ def evaluate_model(env, model, num_tests=20, max_steps=500):
             state = next_state
             steps += 1
 
-        # Calculate total distance traveled
         total_distance = 0.0
         for i in range(1, len(visited)):
             x1, y1 = env.map.nodes[visited[i-1]]['x'], env.map.nodes[visited[i-1]]['y']
             x2, y2 = env.map.nodes[visited[i]]['x'], env.map.nodes[visited[i]]['y']
-            total_distance += ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5
+            total_distance += ((x2 - x1)**2 + (y2 - y1)**2)**0.5
 
-        # Calculate detour ratio
         straight_line_distance = edistance(start_node, goal_node, env.map)
         detour_ratio = total_distance / (straight_line_distance + 1e-6)
-
-        # Calculate efficiency per step
         step_efficiency = total_distance / (steps + 1e-6)
 
-        # Percentage of steps moving closer
         if steps > 0:
             percentage_steps_closer = closer_steps / steps
         else:
             percentage_steps_closer = 0.0
 
-        # Final distance to goal if failed
         if env.current_node != env.goal_node:
             final_distance_failed = edistance(env.current_node, env.goal_node, env.map)
             final_distances_failed.append(final_distance_failed)
 
-        # Record results
         total_rewards.append(cumulative_reward)
         total_distances.append(total_distance)
         total_steps.append(steps)
@@ -91,7 +87,7 @@ def evaluate_model(env, model, num_tests=20, max_steps=500):
         print(f"Test {test_idx+1}: Reward={cumulative_reward:.2f}, Distance={total_distance:.4f}, Steps={steps}, Success={env.current_node==env.goal_node}")
 
     # Summary
-    print("\Evaluation Summary:")
+    print("\nEvaluation Summary:")
     print(f"Success Rate: {success_count}/{num_tests} ({(success_count/num_tests)*100:.1f}%)")
     print(f"Average Reward: {np.mean(total_rewards):.2f}")
     print(f"Average Distance Traveled: {np.mean(total_distances):.4f}")

@@ -8,7 +8,7 @@ import os
     # 'lanes', 'service', 'access', 'bridge', 'tunnel',
     # 'width', 'junction']]
 
-def oms_data(show_graph=False):
+def oms_data(show_graph = False):
     """
     Set up the environment for OSMnx to work with OpenStreetMap data.
     This function configures the data folder and initializes OSMnx settings.
@@ -22,11 +22,14 @@ def oms_data(show_graph=False):
     ox.settings.data_folder = data_folder
     ox.settings.cache_folder = cache_folder
 
-    north, south, east, west = 40.7900, 40.7700, -73.9400, -73.9600
+    place_name = 'Manhattan, New York, USA'
+    map = ox.graph_from_place(place_name, network_type='drive_service')
 
-    map = ox.graph_from_bbox(north, south, east, west, network_type='drive_service')
+    nodes, edges = ox.graph_to_gdfs(map)
+    sample_nodes = nodes.head(1000)
+    subgraph = map.subgraph(sample_nodes.index)
 
-    if show_graph:
-        ox.plot_graph(map)
+    if show_graph: 
+        ox.plot_graph(subgraph)
 
-    return map
+    return subgraph
