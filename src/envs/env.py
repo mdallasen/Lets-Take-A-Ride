@@ -49,24 +49,10 @@ class GraphEnv(gym.Env):
 
         # Ensure the action is valid
         next_node = neighbours[action % len(neighbours)]
-        edge = self.map.get_edge_data(self.current_node, next_node)
-
-        # Extract edge attributes
-        oneway = edge.get('oneway', False)
-        reversed_edge = edge.get('reversed', False)  # careful with how you define 'reversed'!
-        is_highway = self.map.nodes[next_node].get('highway', False)
         street_count = self.map.nodes[next_node].get('street_count', 0)
 
         # Calculate reward
         reward = 0.0
-
-        # Penalize if violating one-way restrictions
-        if oneway and reversed_edge:
-            reward -= 10.0
-
-        # Reward for moving toward highways and busy intersections
-        if is_highway:
-            reward += 5.0
 
         reward += street_count * 0.1
 
@@ -96,7 +82,7 @@ class GraphEnv(gym.Env):
         print(state)
 
         return state, reward, self.done, truncated, {}
-    
+
     def render(self, mode="human"):
         print(f"{self.current_node} → goal {self.goal_node}  step {self.steps_taken}")
 
