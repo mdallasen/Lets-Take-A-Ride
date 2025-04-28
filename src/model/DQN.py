@@ -4,29 +4,23 @@ from tensorflow.keras import layers
 class DQN(tf.keras.Model):
     def __init__(self, state_size, num_actions): 
         super(DQN, self).__init__()
-        self.state_size = state_size
+        self.state_size = state_size * 2
         self.num_actions = num_actions
         
         self.model = tf.keras.Sequential([
-            tf.keras.Input(shape=(state_size,)),
-            
+            tf.keras.Input(shape=(self.state_size,)),    
             tf.keras.layers.Dense(256, activation='relu'),
             tf.keras.layers.Dense(256, activation='relu'),
-            
             tf.keras.layers.Dense(128, activation='relu'),
             tf.keras.layers.Dense(64, activation='relu'),
-
-            tf.keras.layers.Dense(num_actions, activation=None)  # No activation on Q-values
+            tf.keras.layers.Dense(num_actions, activation=None)  
         ])
 
         self.optimizer = tf.keras.optimizers.Adam(learning_rate = 0.001) 
-        self.model.build(input_shape = (None, state_size))
         self.target_model = tf.keras.models.clone_model(self.model)
         self.target_model.set_weights(self.model.get_weights())
 
-    def call(self, states): 
-        if tf.rank(states) == 1:           
-            states = tf.expand_dims(states, 0)  
+    def call(self, states):   
         return self.model(states)
 
     def loss_func(self, batch, discount_factor = 0.99): 

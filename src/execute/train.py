@@ -8,14 +8,19 @@ def train_episode(env, model, batch_size, memory, epsilon=.1):
     state = env.reset()[0]
     done = False
     ep_rwd = []
-    num_batches = 50
+    num_batches = 1
 
     # e greedy approach to selecting action
     while not done:
         if np.random.rand() < epsilon:
             action = env.action_space.sample()
         else: 
-            q_values = model(tf.one_hot([state], depth=env.state_space, dtype=tf.float32))
+            state_vector = tf.concat([
+                tf.one_hot([state[0]], depth=env.state_space, dtype=tf.float32),
+                tf.one_hot([state[1]], depth=env.state_space, dtype=tf.float32)
+            ], axis=-1)
+            state_vector = tf.expand_dims(state_vector, 0)
+            q_values = model(state_vector)
             action = np.argmax(q_values[0].numpy())
 
         # determine the rewards, next state etc. from that action
@@ -32,9 +37,16 @@ def train_episode(env, model, batch_size, memory, epsilon=.1):
                 batch = [memory[i] for i in indices]
                 states, actions, rewards, next_states, dones = zip(*batch)
                 
-                states = tf.one_hot(states, depth=env.state_space, dtype=tf.float32)         # (32, 6572)
-                next_states = tf.one_hot(next_states, depth=env.state_space, dtype=tf.float32)
-                next_states = tf.convert_to_tensor(np.array(next_states), dtype=tf.float32)
+                states = tf.concat([
+                    tf.one_hot([s[0] for s in states], depth=env.state_space, dtype=tf.float32),
+                    tf.one_hot([s[1] for s in states], depth=env.state_space, dtype=tf.float32)
+                ], axis=-1)
+
+                next_states = tf.concat([
+                    tf.one_hot([s[0] for s in next_states], depth=env.state_space, dtype=tf.float32),
+                    tf.one_hot([s[1] for s in next_states], depth=env.state_space, dtype=tf.float32)
+                ], axis=-1)
+
                 actions = tf.convert_to_tensor(actions, dtype=tf.int32)
                 rewards = tf.convert_to_tensor(rewards, dtype=tf.float32)
                 dones = tf.convert_to_tensor(dones, dtype=tf.bool)

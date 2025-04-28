@@ -13,7 +13,7 @@ def main():
     model = DQN(state_size, num_actions)
 
     totalReward = []
-    num_episodes = 10
+    num_episodes = 1
     memory=None
 
     for episode in range(num_episodes):
@@ -26,9 +26,9 @@ def main():
 
     print(f"\nAverage Reward over {num_episodes} episodes: {sum(totalReward)/len(totalReward):.2f}")
 
-    visualize_trip(model, env)
-    visual_gif(model, env, gif_path="my_trip.gif")
-    visualize_data(totalReward)
+    # visualize_trip(model, env)
+    # visual_gif(model, env, gif_path="my_trip.gif")
+    # visualize_data(totalReward)
 
 if __name__ == "__main__": 
     main()

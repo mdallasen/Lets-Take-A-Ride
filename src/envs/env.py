@@ -18,17 +18,26 @@ class GraphEnv(gym.Env):
         self.done = False
         self.reward = 0.0
         self.state_space = len(self.nodes)
+        self.goal_space = 50 
 
     def reset(self, *, seed=None, options=None):
         super().reset(seed=seed)
         
-        self.goal_node = self.nodes[-1]
-        self.current_node = self.nodes[0]
+        self.goal_nodes = random.sample(self.nodes, self.goal_space)
+        self.current_node = random.choice(self.nodes)
+
+        self.goal_node = random.choice(self.goal_nodes)
+        self.current_node = random.choice(self.nodes)
+        while self.current_node == self.goal_node:
+            self.current_node = random.choice(self.nodes)
+
         self.steps_taken = 0
         self.done = False
         self.reward = 0.0
 
-        return self.node_to_index[self.current_node], {}
+        state = (self.node_to_index[self.current_node], self.node_to_index[self.goal_node])
+
+        return state, {}
 
     def step(self, action: int):
         if self.done:
@@ -60,8 +69,10 @@ class GraphEnv(gym.Env):
         if truncated:
             self.done = True
 
-        return self.node_to_index[self.current_node], reward, self.done, truncated, {}
+        state = (self.node_to_index[self.current_node], self.node_to_index[self.goal_node])
 
+        return state, reward, self.done, truncated, {}
+    
     def render(self, mode="human"):
         print(f"{self.current_node} → goal {self.goal_node}  step {self.steps_taken}")
 
