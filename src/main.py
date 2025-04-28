@@ -14,7 +14,7 @@ def main():
     model = DQN(state_size, num_actions)
 
     totalReward = []
-    num_episodes = 50
+    num_episodes = 500
     memory=None
 
     for episode in range(num_episodes):
