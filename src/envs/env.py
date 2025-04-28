@@ -4,7 +4,6 @@ import random
 import networkx as nx
 from utils.helper import edistance
 class GraphEnv(gym.Env):
-    """Goal-conditioned graph navigation"""
 
     metadata = {"render_modes": ["human"]}
 

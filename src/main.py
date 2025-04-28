@@ -5,7 +5,7 @@ from envs.env_data import oms_data
 from envs.env import GraphEnv
 
 def main(): 
-    map = oms_data(True)
+    map = oms_data()
     env = GraphEnv(map)
     state_size = len(env.nodes)
 
@@ -13,7 +13,7 @@ def main():
     model = DQN(state_size, num_actions)
 
     totalReward = []
-    num_episodes = 50
+    num_episodes = 200
     memory=None
 
     for episode in range(num_episodes):
