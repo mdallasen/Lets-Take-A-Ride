@@ -22,7 +22,7 @@ def visualize_trip(model, env=None, node_size=10):
 
     done = False
     visited = [env.current_node]
-    goal_nodes = env.goal_nodes  # 🔥 Use both goal nodes
+    goal_nodes = env.goal_nodes  
     check = False
 
     while not done:
