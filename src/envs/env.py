@@ -7,7 +7,7 @@ class GraphEnv(gym.Env):
 
     metadata = {"render_modes": ["human"]}
 
-    def __init__(self, graph: nx.Graph, max_steps: int = 500):
+    def __init__(self, graph: nx.Graph, max_steps: int = 150):
         super().__init__()
         self.map = graph
         self.nodes = list(graph.nodes())
@@ -17,7 +17,8 @@ class GraphEnv(gym.Env):
         self.steps_taken = 0
         self.done = False
         self.state_space = len(self.nodes)
-        self.goal_space = 2
+        self.goal_space = 1
+        self.visited_nodes = set()  
 
     def reset(self, *, seed=None, options=None):
         super().reset(seed=seed)
@@ -32,6 +33,7 @@ class GraphEnv(gym.Env):
         self.steps_taken = 0
         self.done = False
         self.reward = 0.0
+        self.visited_nodes = {self.current_node}
 
         state = (self.node_to_index[self.current_node], self.node_to_index[self.goal_node])
 
@@ -65,6 +67,11 @@ class GraphEnv(gym.Env):
         else:
             reward -= 1.0
 
+        if next_node in self.visited_nodes:
+            reward -= 5.0
+
+        self.visited_nodes.add(next_node)
+
         # Update state
         self.current_node = next_node
         self.steps_taken += 1
@@ -79,7 +86,7 @@ class GraphEnv(gym.Env):
 
         state = (self.node_to_index[self.current_node], self.node_to_index[self.goal_node])
 
-        print(state)
+        #print(state)
 
         return state, reward, self.done, truncated, {}
 
