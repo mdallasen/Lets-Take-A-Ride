@@ -22,11 +22,11 @@ def visualize_trip(model, env=None, node_size=10):
 
     done = False
     visited = [env.current_node]
-    goal_node = env.goal_node
+    goal_nodes = env.goal_nodes  # 🔥 Use both goal nodes
     check = False
 
     while not done:
-        if env.current_node == env.goal_node:
+        if env.current_node in goal_nodes:
             if not check:
                 print("🚨 Start and goal are the same! No trip needed.")
             break
@@ -48,7 +48,7 @@ def visualize_trip(model, env=None, node_size=10):
         visited.append(env.current_node)
         state = next_state
 
-        done = terminated or truncated
+        done = terminated or truncated or (env.current_node in goal_nodes)
 
     pos = {node: (env.map.nodes[node]['x'], env.map.nodes[node]['y']) for node in env.map.nodes}
 
@@ -57,15 +57,20 @@ def visualize_trip(model, env=None, node_size=10):
     nx.draw(env.map, pos, node_size=node_size, edge_color='gray', alpha=0.3, ax=ax)
 
     # Zoom into path region
+    """
     visited_x = [pos[n][0] for n in visited]
     visited_y = [pos[n][1] for n in visited]
     padding = 0.002
     ax.set_xlim(min(visited_x) - padding, max(visited_x) + padding)
     ax.set_ylim(min(visited_y) - padding, max(visited_y) + padding)
+    
+    """
+    
 
-    # Add static goal flag
-    goal_x, goal_y = pos[goal_node]
-    ax.text(goal_x, goal_y, "🏁", fontsize=16, ha='center', va='center', zorder=5)
+    # Add static goal flags for both goals
+    for goal in goal_nodes:
+        goal_x, goal_y = pos[goal]
+        ax.text(goal_x, goal_y, "GOAL", fontsize=16, ha='center', va='center', zorder=5)
 
     text_handle = ax.text(0.02, 0.98, "", transform=ax.transAxes,
                           verticalalignment='top', fontsize=12,
@@ -82,9 +87,8 @@ def visualize_trip(model, env=None, node_size=10):
             emoji_handle.remove()
 
         x, y = pos[visited[i]]
-        emoji_handle = ax.text(x, y, "🚗", fontsize=16, ha='center', va='center', zorder=6)
+        emoji_handle = ax.text(x, y, "CAR", fontsize=16, ha='center', va='center', zorder=6)
 
-        # Update distance
         x1, y1 = pos[visited[i-1]]
         x2, y2 = pos[visited[i]]
         cumulative_distance += ((x2 - x1)**2 + (y2 - y1)**2)**0.5
@@ -106,17 +110,18 @@ def visual_gif(model, env=None, node_size=10, gif_path="trip.gif", max_frames=50
 
     state = env.reset()[0]
 
-    if env.current_node == env.goal_node:
-        print("🚨 Start and goal are the same! No trip needed.")
+    goal_nodes = env.goal_nodes
+
+    if env.current_node in goal_nodes:
+        print("Start and goal are the same! No trip needed.")
         return
 
     visited = [env.current_node]
     cumulative_distances = [0.0]
-    goal_node = env.goal_node
 
     done = False
     while not done:
-        if env.current_node == env.goal_node:
+        if env.current_node in goal_nodes:
             break
 
         state_tensor = tf.concat([
@@ -139,7 +144,7 @@ def visual_gif(model, env=None, node_size=10, gif_path="trip.gif", max_frames=50
         cumulative_distances.append(cumulative_distances[-1] + distance)
 
         state = next_state
-        done = terminated or truncated
+        done = terminated or truncated or (env.current_node in goal_nodes)
 
     pos = {node: (env.map.nodes[node]['x'], env.map.nodes[node]['y']) for node in env.map.nodes}
 
@@ -161,11 +166,12 @@ def visual_gif(model, env=None, node_size=10, gif_path="trip.gif", max_frames=50
     ax.set_xlim(min(visited_x) - padding, max(visited_x) + padding)
     ax.set_ylim(min(visited_y) - padding, max(visited_y) + padding)
 
-    goal_x, goal_y = pos[goal_node]
-    ax.text(goal_x, goal_y, "🏁", fontsize=16, ha='center', va='center', zorder=5)
+    for goal in goal_nodes:
+        goal_x, goal_y = pos[goal]
+        ax.text(goal_x, goal_y, "🏁", fontsize=16, ha='center', va='center', zorder=5)
 
     path_line, = ax.plot([], [], color='blue', linewidth=2)
-    emoji_handle = ax.text(*pos[visited[0]], "🚗", fontsize=16, ha='center', va='center', zorder=6)
+    emoji_handle = ax.text(*pos[visited[0]], "CAR", fontsize=16, ha='center', va='center', zorder=6)
     text_handle = ax.text(0.02, 0.98, "", transform=ax.transAxes,
                           verticalalignment='top', fontsize=12,
                           bbox=dict(facecolor='white', alpha=0.8))
