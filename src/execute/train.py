@@ -8,7 +8,7 @@ def train_episode(env, model, batch_size, memory, epsilon=.1):
     state = env.reset()[0]
     done = False
     ep_rwd = []
-    num_batches = 1
+    num_batches = 10
 
     # e greedy approach to selecting action
     while not done:
@@ -94,7 +94,7 @@ def train(env, model, memory = None, epsilon=.1):
                         break
                 memory.extend(ep_memory)
 
-        memory = memory[-1000:]
+        memory = memory[-500:]
         total_r, memory = train_episode(env, model, batch_size=5, memory=memory, epsilon=epsilon)
         
         return total_r, memory

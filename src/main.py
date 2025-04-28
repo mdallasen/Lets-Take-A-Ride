@@ -6,7 +6,7 @@ from envs.env import GraphEnv
 from execute.test_model import evaluate_model
 
 def main(): 
-    map = oms_data()
+    map = oms_data(True)
     env = GraphEnv(map)
     state_size = len(env.nodes)
 
@@ -14,7 +14,7 @@ def main():
     model = DQN(state_size, num_actions)
 
     totalReward = []
-    num_episodes = 10
+    num_episodes = 50
     memory=None
 
     for episode in range(num_episodes):

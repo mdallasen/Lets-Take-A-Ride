@@ -22,11 +22,12 @@ def oms_data(show_graph=False):
     ox.settings.data_folder = data_folder
     ox.settings.cache_folder = cache_folder
 
-    north, south, east, west = 40.7900, 40.7700, -73.9400, -73.9600
+    center_point = (40.7780, -73.9580)
+    distance_m = 300  # meters
 
-    map = ox.graph_from_bbox(north, south, east, west, network_type='drive_service')
+    map = ox.graph_from_point(center_point, dist=distance_m, network_type='drive')
 
     if show_graph:
-        ox.plot_graph(map)
+        ox.plot_graph(map, figsize=(6, 6))
 
     return map
