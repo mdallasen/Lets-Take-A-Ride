@@ -22,13 +22,8 @@ class GraphEnv(gym.Env):
     def reset(self, *, seed=None, options=None):
         super().reset(seed=seed)
         
-        if not hasattr(self, 'goal_node'):
-            self.goal_node = random.choice(self.nodes)
-        
-        if self.goal_node not in self.map.nodes:
-            raise ValueError(f"goal_node {self.goal_node} is not in the map!")
-        
-        self.current_node = random.choice(self.nodes)
+        self.goal_node = self.nodes[-1]
+        self.current_node = self.nodes[0]
         self.steps_taken = 0
         self.done = False
         self.reward = 0.0
