@@ -1,10 +1,8 @@
-import sys
 from model.DQN import DQN
 from execute.train import train
 from execute.inference import visualize_data, visualize_trip, visual_gif
 from envs.env_data import oms_data
 from envs.env import GraphEnv
-from execute.test_model import evaluate_model
 
 def main(): 
     map = oms_data(True)
@@ -15,7 +13,7 @@ def main():
     model = DQN(state_size, num_actions)
 
     totalReward = []
-    num_episodes = 100
+    num_episodes = 10
     memory=None
 
     for episode in range(num_episodes):
@@ -28,13 +26,9 @@ def main():
 
     print(f"\nAverage Reward over {num_episodes} episodes: {sum(totalReward)/len(totalReward):.2f}")
 
-    print("\n🚀 Running Full Evaluation Tests")
-    eval_results = evaluate_model(env, model, num_tests=20)
     visualize_trip(model, env)
     visual_gif(model, env, gif_path="my_trip.gif")
     visualize_data(totalReward)
-    
-
 
 if __name__ == "__main__": 
     main()

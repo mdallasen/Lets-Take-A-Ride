@@ -1,7 +1,6 @@
 import numpy as np
 import tensorflow as tf
 from model.DQN import DQN
-from utils.helper import encode_state
 
 def train_episode(env, model, batch_size, memory, epsilon=.1):
 
