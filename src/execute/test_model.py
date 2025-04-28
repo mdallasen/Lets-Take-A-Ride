@@ -2,9 +2,10 @@ import numpy as np
 import tensorflow as tf
 from utils.helper import edistance
 
-def evaluate_model(env, model, num_tests=20, max_steps=500):
+def evaluate_model(env, model, num_tests=20, max_steps=50):
     """
     Evaluates the model on random trips.
+    Reaching **either** of the two goal_nodes counts as success.
     Reports success rate, average reward, distance, steps, detour ratio, etc.
     """
     success_count = 0
@@ -19,7 +20,7 @@ def evaluate_model(env, model, num_tests=20, max_steps=500):
     for test_idx in range(num_tests):
         state = env.reset()[0]
 
-        if env.current_node == env.goal_node:
+        if env.current_node in env.goal_nodes:
             print(f"Test {test_idx+1}: Start and goal are the same. Skipping.")
             continue
 
@@ -30,8 +31,7 @@ def evaluate_model(env, model, num_tests=20, max_steps=500):
         steps = 0
 
         start_node = env.current_node
-        goal_node = env.goal_node
-
+        goal_nodes = env.goal_nodes  
         while not done and steps < max_steps:
             state_tensor = tf.concat([
                 tf.one_hot([state[0]], depth=env.state_space, dtype=tf.float32),
@@ -41,15 +41,15 @@ def evaluate_model(env, model, num_tests=20, max_steps=500):
             q_values = model(state_tensor)
             action = np.argmax(q_values[0].numpy())
 
-            cur_d = edistance(env.current_node, env.goal_node, env.map)
+            cur_d = min(edistance(env.current_node, g, env.map) for g in goal_nodes)
 
             next_state, reward, terminated, truncated, _ = env.step(action)
 
-            nxt_d = edistance(env.current_node, env.goal_node, env.map)
+            nxt_d = min(edistance(env.current_node, g, env.map) for g in goal_nodes)
             if nxt_d < cur_d:
                 closer_steps += 1
 
-            done = terminated or truncated
+            done = terminated or truncated or (env.current_node in goal_nodes)
             cumulative_reward += reward
             visited.append(env.current_node)
             state = next_state
@@ -61,7 +61,7 @@ def evaluate_model(env, model, num_tests=20, max_steps=500):
             x2, y2 = env.map.nodes[visited[i]]['x'], env.map.nodes[visited[i]]['y']
             total_distance += ((x2 - x1)**2 + (y2 - y1)**2)**0.5
 
-        straight_line_distance = edistance(start_node, goal_node, env.map)
+        straight_line_distance = min(edistance(start_node, g, env.map) for g in goal_nodes)
         detour_ratio = total_distance / (straight_line_distance + 1e-6)
         step_efficiency = total_distance / (steps + 1e-6)
 
@@ -70,8 +70,8 @@ def evaluate_model(env, model, num_tests=20, max_steps=500):
         else:
             percentage_steps_closer = 0.0
 
-        if env.current_node != env.goal_node:
-            final_distance_failed = edistance(env.current_node, env.goal_node, env.map)
+        if env.current_node not in goal_nodes:
+            final_distance_failed = min(edistance(env.current_node, g, env.map) for g in goal_nodes)
             final_distances_failed.append(final_distance_failed)
 
         total_rewards.append(cumulative_reward)
@@ -81,10 +81,10 @@ def evaluate_model(env, model, num_tests=20, max_steps=500):
         step_efficiencies.append(step_efficiency)
         closer_step_percentages.append(percentage_steps_closer)
 
-        if env.current_node == env.goal_node:
+        if env.current_node in goal_nodes:
             success_count += 1
 
-        print(f"Test {test_idx+1}: Reward={cumulative_reward:.2f}, Distance={total_distance:.4f}, Steps={steps}, Success={env.current_node==env.goal_node}")
+        print(f"Test {test_idx+1}: Reward={cumulative_reward:.2f}, Distance={total_distance:.4f}, Steps={steps}, Success={env.current_node in goal_nodes}")
 
     # Summary
     print("\nEvaluation Summary:")
