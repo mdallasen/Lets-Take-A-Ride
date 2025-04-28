@@ -1,9 +1,10 @@
 from model.DQN import DQN
 from execute.train import train
-from execute.inference import visualize_data, visualize_trip, visual_gif
-from envs.env_data import oms_data
+from execute.inference import visualize_data
 from envs.env import GraphEnv
 from execute.test_model import evaluate_model
+from envs.env_data import oms_data
+
 
 def main(): 
     map = oms_data(True)
@@ -14,7 +15,7 @@ def main():
     model = DQN(state_size, num_actions)
 
     totalReward = []
-    num_episodes = 100
+    num_episodes = 10
     memory=None
 
     for episode in range(num_episodes):

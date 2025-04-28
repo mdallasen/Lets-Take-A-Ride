@@ -87,8 +87,8 @@ def evaluate_model(env, model, num_tests=20, max_steps=50):
             success_count += 1
 
             if working is False:
-                visualize_trip(model, env)
-                visual_gif(model, env, gif_path="my_trip.gif")
+                visualize_trip(model, env, visited)
+                visual_gif(model, env, visited, gif_path="my_trip.gif")
                 working = True
                 
 

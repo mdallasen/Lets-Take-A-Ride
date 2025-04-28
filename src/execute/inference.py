@@ -9,47 +9,10 @@ import os
 import shutil
 from PIL import Image
 
-def visualize_trip(model, env=None, node_size=10):
+def visualize_trip(model, env, visited, node_size=10):
     """
-    Visualizes a full trip from start to goal using the trained model.
-    Animates a car emoji moving across the map and shows live distance traveled.
+    Visualizes an existing trip from start to goal using the visited path.
     """
-    if env is None:
-        map = oms_data()
-        env = GraphEnv(map)
-
-    state = env.reset()[0]
-
-    done = False
-    visited = [env.current_node]
-    goal_nodes = env.goal_nodes  
-    check = False
-
-    while not done:
-        if env.current_node in goal_nodes:
-            if not check:
-                print("🚨 Start and goal are the same! No trip needed.")
-            break
-
-        # Correct one-hot encoding
-        state_tensor = tf.concat([
-            tf.one_hot([state[0]], depth=env.state_space, dtype=tf.float32),
-            tf.one_hot([state[1]], depth=env.state_space, dtype=tf.float32)
-        ], axis=-1)
-
-        q_values = model(state_tensor)
-        action = np.argmax(q_values[0].numpy())
-        check = True
-
-        if env.done:
-            break
-
-        next_state, reward, terminated, truncated, _ = env.step(action)
-        visited.append(env.current_node)
-        state = next_state
-
-        done = terminated or truncated or (env.current_node in goal_nodes)
-
     pos = {node: (env.map.nodes[node]['x'], env.map.nodes[node]['y']) for node in env.map.nodes}
 
     # Setup figure
@@ -57,18 +20,14 @@ def visualize_trip(model, env=None, node_size=10):
     nx.draw(env.map, pos, node_size=node_size, edge_color='gray', alpha=0.3, ax=ax)
 
     # Zoom into path region
-    """
     visited_x = [pos[n][0] for n in visited]
     visited_y = [pos[n][1] for n in visited]
     padding = 0.002
     ax.set_xlim(min(visited_x) - padding, max(visited_x) + padding)
     ax.set_ylim(min(visited_y) - padding, max(visited_y) + padding)
-    
-    """
-    
 
-    # Add static goal flags for both goals
-    for goal in goal_nodes:
+    # Add goal flags
+    for goal in env.goal_nodes:
         goal_x, goal_y = pos[goal]
         ax.text(goal_x, goal_y, "GOAL", fontsize=16, ha='center', va='center', zorder=5)
 
@@ -100,52 +59,10 @@ def visualize_trip(model, env=None, node_size=10):
     plt.tight_layout()
     plt.show()
 
-def visual_gif(model, env=None, node_size=10, gif_path="trip.gif", max_frames=50):
+def visual_gif(model, env, visited, node_size=10, gif_path="trip.gif", max_frames=50):
     """
-    Visualizes a trip and saves it as a GIF with at most max_frames frames.
+    Visualizes an existing trip and saves it to a GIF with at most max_frames frames.
     """
-    if env is None:
-        map = oms_data()
-        env = GraphEnv(map)
-
-    state = env.reset()[0]
-
-    goal_nodes = env.goal_nodes
-
-    if env.current_node in goal_nodes:
-        print("Start and goal are the same! No trip needed.")
-        return
-
-    visited = [env.current_node]
-    cumulative_distances = [0.0]
-
-    done = False
-    while not done:
-        if env.current_node in goal_nodes:
-            break
-
-        state_tensor = tf.concat([
-            tf.one_hot([state[0]], depth=env.state_space, dtype=tf.float32),
-            tf.one_hot([state[1]], depth=env.state_space, dtype=tf.float32)
-        ], axis=-1)
-
-        q_values = model(state_tensor)
-        action = np.argmax(q_values[0].numpy())
-
-        if env.done:
-            break
-
-        next_state, reward, terminated, truncated, _ = env.step(action)
-        visited.append(env.current_node)
-
-        x1, y1 = env.map.nodes[visited[-2]]['x'], env.map.nodes[visited[-2]]['y']
-        x2, y2 = env.map.nodes[visited[-1]]['x'], env.map.nodes[visited[-1]]['y']
-        distance = ((x2 - x1)**2 + (y2 - y1)**2)**0.5
-        cumulative_distances.append(cumulative_distances[-1] + distance)
-
-        state = next_state
-        done = terminated or truncated or (env.current_node in goal_nodes)
-
     pos = {node: (env.map.nodes[node]['x'], env.map.nodes[node]['y']) for node in env.map.nodes}
 
     frame_dir = "_trip_frames"
@@ -166,15 +83,22 @@ def visual_gif(model, env=None, node_size=10, gif_path="trip.gif", max_frames=50
     ax.set_xlim(min(visited_x) - padding, max(visited_x) + padding)
     ax.set_ylim(min(visited_y) - padding, max(visited_y) + padding)
 
-    for goal in goal_nodes:
+    for goal in env.goal_nodes:
         goal_x, goal_y = pos[goal]
-        ax.text(goal_x, goal_y, "🏁", fontsize=16, ha='center', va='center', zorder=5)
+        ax.text(goal_x, goal_y, "GOAL", fontsize=16, ha='center', va='center', zorder=5)
 
     path_line, = ax.plot([], [], color='blue', linewidth=2)
     emoji_handle = ax.text(*pos[visited[0]], "CAR", fontsize=16, ha='center', va='center', zorder=6)
     text_handle = ax.text(0.02, 0.98, "", transform=ax.transAxes,
                           verticalalignment='top', fontsize=12,
                           bbox=dict(facecolor='white', alpha=0.8))
+
+    cumulative_distances = [0.0]
+    for i in range(1, len(visited)):
+        x1, y1 = pos[visited[i-1]]
+        x2, y2 = pos[visited[i]]
+        distance = ((x2 - x1)**2 + (y2 - y1)**2)**0.5
+        cumulative_distances.append(cumulative_distances[-1] + distance)
 
     for idx, i in enumerate(indices):
         path_x, path_y = zip(*[pos[n] for n in visited[:i+1]])
