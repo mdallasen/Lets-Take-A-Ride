@@ -13,12 +13,14 @@ def main():
     model = DQN(state_size, num_actions)
 
     totalReward = []
-    num_episodes = 1
+    num_episodes = 10
     memory=None
 
     for episode in range(num_episodes):
+        print("NEW EPISODE")
         print(episode, end = "\r")
         reward, memory = train(env, model, memory=memory, epsilon = 1-episode/num_episodes)
+        print(reward)
 
         if episode in range(0, num_episodes):
             totalReward.append(reward)

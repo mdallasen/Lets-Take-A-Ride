@@ -18,17 +18,16 @@ class GraphEnv(gym.Env):
         self.done = False
         self.reward = 0.0
         self.state_space = len(self.nodes)
-        self.goal_space = 50 
+        self.goal_space = 10 
 
     def reset(self, *, seed=None, options=None):
         super().reset(seed=seed)
-        
-        self.goal_nodes = random.sample(self.nodes, self.goal_space)
-        self.current_node = random.choice(self.nodes)
 
+        self.goal_nodes = random.sample(self.nodes, self.goal_space)
         self.goal_node = random.choice(self.goal_nodes)
+        
         self.current_node = random.choice(self.nodes)
-        while self.current_node == self.goal_node:
+        while self.current_node == self.goal_node or not list(self.map.neighbors(self.current_node)):
             self.current_node = random.choice(self.nodes)
 
         self.steps_taken = 0
@@ -48,9 +47,9 @@ class GraphEnv(gym.Env):
         if not neighbours:
             self.done = True
             return self.node_to_index[self.current_node], -10.0, True, False, {}
-
+        
         neighbours.sort(key=lambda n: (self.map.nodes[n]["y"], self.map.nodes[n]["x"]))
-        next_node = neighbours[action % len(neighbours)]     # wraps safely for degree < 3
+        next_node = neighbours[action % len(neighbours)]
 
         cur_d = edistance(self.current_node, self.goal_node, self.map)
         nxt_d = edistance(next_node, self.goal_node, self.map)
@@ -70,6 +69,8 @@ class GraphEnv(gym.Env):
             self.done = True
 
         state = (self.node_to_index[self.current_node], self.node_to_index[self.goal_node])
+
+        print(state)
 
         return state, reward, self.done, truncated, {}
     

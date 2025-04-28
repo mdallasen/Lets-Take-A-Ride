@@ -20,7 +20,9 @@ class DQN(tf.keras.Model):
         self.target_model = tf.keras.models.clone_model(self.model)
         self.target_model.set_weights(self.model.get_weights())
 
-    def call(self, states):   
+    def call(self, states): 
+        if tf.rank(states) == 1:           
+            states = tf.expand_dims(states, 0)  
         return self.model(states)
 
     def loss_func(self, batch, discount_factor = 0.99): 

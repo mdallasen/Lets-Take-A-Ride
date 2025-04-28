@@ -19,7 +19,6 @@ def train_episode(env, model, batch_size, memory, epsilon=.1):
                 tf.one_hot([state[0]], depth=env.state_space, dtype=tf.float32),
                 tf.one_hot([state[1]], depth=env.state_space, dtype=tf.float32)
             ], axis=-1)
-            state_vector = tf.expand_dims(state_vector, 0)
             q_values = model(state_vector)
             action = np.argmax(q_values[0].numpy())
 
@@ -36,17 +35,32 @@ def train_episode(env, model, batch_size, memory, epsilon=.1):
                 indices = np.random.randint(0, len(memory), size=batch_size)
                 batch = [memory[i] for i in indices]
                 states, actions, rewards, next_states, dones = zip(*batch)
+                                
+                states = [
+                    tf.concat([
+                        tf.one_hot([state[0]], depth=env.state_space, dtype=tf.float32),
+                        tf.one_hot([state[1]], depth=env.state_space, dtype=tf.float32)
+                    ], axis=-1) 
+                    for state in states
+                ]
+
+                next_states = [
+                    (next_state[0], next_state[1]) if isinstance(next_state, (tuple, list)) else (next_state, next_state)
+                    for next_state in next_states
+                ]
                 
-                states = tf.concat([
-                    tf.one_hot([s[0] for s in states], depth=env.state_space, dtype=tf.float32),
-                    tf.one_hot([s[1] for s in states], depth=env.state_space, dtype=tf.float32)
-                ], axis=-1)
+                next_states = [
+                    tf.concat([
+                        tf.one_hot([next_state[0]], depth=env.state_space, dtype=tf.float32),
+                        tf.one_hot([next_state[1]], depth=env.state_space, dtype=tf.float32)
+                    ], axis=-1) 
+                    for next_state in next_states
+                ]
 
-                next_states = tf.concat([
-                    tf.one_hot([s[0] for s in next_states], depth=env.state_space, dtype=tf.float32),
-                    tf.one_hot([s[1] for s in next_states], depth=env.state_space, dtype=tf.float32)
-                ], axis=-1)
-
+                states = tf.squeeze(states) 
+                next_states = tf.squeeze(next_states) 
+                states = tf.convert_to_tensor(states, dtype=tf.float32)
+                next_states = tf.convert_to_tensor(next_states, dtype=tf.float32)
                 actions = tf.convert_to_tensor(actions, dtype=tf.int32)
                 rewards = tf.convert_to_tensor(rewards, dtype=tf.float32)
                 dones = tf.convert_to_tensor(dones, dtype=tf.bool)
