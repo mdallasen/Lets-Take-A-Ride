@@ -46,37 +46,40 @@ class GraphEnv(gym.Env):
         if not neighbours:
             self.done = True
             return self.node_to_index[self.current_node], -10.0, True, False, {}
-        
-        action_reward = []
-        
-        for i, next_node in enumerate(neighbours):
-            edge = self.map.get_edge_data(self.current_node, next_node)
-            oneway = edge.get('oneway', False)
-            reversed_edge = edge.get('reversed', False)
-            is_highway = self.map.nodes[next_node].get('highway', False)
-            street_count = self.map.nodes[next_node].get('street_count', 0)
 
-            # Penalize if the edge is one-way and the agent is going in the wrong direction
-            if oneway and reversed_edge:
-                action_reward.append(-10.0)  # Penalize for wrong direction
-
-            # Reward for moving to a highway node and nodes with higher street count
-            reward = 0
-            if is_highway:
-                reward += 5.0  # Encourage moving towards highways
-            reward += street_count * 0.1  # Reward for higher street count
-
-            # Calculate the distance between current node and goal node
-            cur_d = edistance(self.current_node, self.goal_node, self.map)
-            nxt_d = edistance(next_node, self.goal_node, self.map)
-
-            # Penalize for moving away from the goal
-            reward += 1.0 if nxt_d < cur_d else -1.0
-
-            action_reward.append(reward)
-        
+        # Ensure the action is valid
         next_node = neighbours[action % len(neighbours)]
+        edge = self.map.get_edge_data(self.current_node, next_node)
 
+        # Extract edge attributes
+        oneway = edge.get('oneway', False)
+        reversed_edge = edge.get('reversed', False)  # careful with how you define 'reversed'!
+        is_highway = self.map.nodes[next_node].get('highway', False)
+        street_count = self.map.nodes[next_node].get('street_count', 0)
+
+        # Calculate reward
+        reward = 0.0
+
+        # Penalize if violating one-way restrictions
+        if oneway and reversed_edge:
+            reward -= 10.0
+
+        # Reward for moving toward highways and busy intersections
+        if is_highway:
+            reward += 5.0
+
+        reward += street_count * 0.1
+
+        # Distance-based reward
+        cur_d = edistance(self.current_node, self.goal_node, self.map)
+        nxt_d = edistance(next_node, self.goal_node, self.map)
+
+        if nxt_d < cur_d:
+            reward += 1.0
+        else:
+            reward -= 1.0
+
+        # Update state
         self.current_node = next_node
         self.steps_taken += 1
 
