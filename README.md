@@ -5,7 +5,13 @@
 ---
 
 ## 📖 Overview  
-A reinforcement learning agent that learns to navigate a real-world inspired New York City street network using Goal-Conditioned Deep Q-Learning. The environment is built from OpenStreetMap data with realistic constraints like one-way streets and dynamic action spaces.
+
+The objective of this report is to develop an autonomous taxi agent capable of navigating between randomly selected start and end points within New York City. Traditional approaches have typically relied on rule-based algorithms for pathfinding, which often falter in dynamic or unpredictable urban environments. In contrast, this research aims to enhance the robustness and adaptability of autonomous navigation by leveraging Reinforcement Learning (RL).
+
+By framing navigation as a sequential decision-making problem, we train an agent to optimize its route while balancing efficiency, safety, and adaptability. Using a simulated urban environment, the agent learns through interaction to make decisions that account for real-world complexity offering a significant advantage over static methods.
+
+This report employs Deep Q-Networks (DQN), a model-free RL algorithm that enables scalable learning and effective approximation of optimal action-value functions. Moreover, the task is structured as goal-conditioned reinforcement learning, requiring the agent to condition its policy not only on its current state but also on a specified destination. This formulation allows for better generalization across a wide range of goals and environments, moving closer to the deployment of intelligent, self-navigating agents in real-world urban settings.
+
 
 ---
 
