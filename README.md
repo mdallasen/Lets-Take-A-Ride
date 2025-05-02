@@ -65,29 +65,37 @@ This report employs Deep Q-Networks (DQN), a model-free RL algorithm that enable
 ## 📁 Project Structure
 
 ```plaintext
+
 lets-take-a-ride/
 ├── data/                       # Cached OpenStreetMap data
-│   ├── *.graphml               # OSMnx preprocessed map files
+│   └── *.graphml               # OSMnx preprocessed map files (shown as hashed filenames in screenshot)
+├── report/                     # Project report
+│   ├── report.pdf              # Final report
+│   └── poster.jpg              # Project poster or visualization
 ├── src/
 │   ├── envs/                   # Custom RL environment
+│   │   ├── __pycache__/        # Python cache
 │   │   ├── env.py              # Gymnasium environment logic
 │   │   └── env_data.py         # Preprocessing and environment utilities
 │   ├── execute/                # Main training and evaluation scripts
+│   │   ├── __pycache__/        # Python cache
 │   │   ├── train.py            # Training the agent
 │   │   ├── test_model.py       # Evaluate a saved model
 │   │   └── inference.py        # Run inference / deployment
-│   ├── model/                  # DQN and other RL algorithms
-│   │   ├── DQN.py              # Deep Q-Network implementation
-│   │   └── ActorCritic.py      # Optional: Actor-Critic model
+│   ├── model/                  # RL algorithms
+│   │   ├── __pycache__/        # Python cache
+│   │   ├── DQN.py              # DQN implementation
+│   │   └── ActorCritic.py      # Actor-Critic model
 │   └── utils/                  # Helper functions
+│       ├── __pycache__/        # Python cache
 │       └── helper.py
 ├── main.py                     # Entry point to train and evaluate the agent
 ├── requirements.txt            # Python dependencies
 ├── trips/                      # GIFs of agent trajectories
-├── .gitignore                  # git ignore for data and other folders / files
-├── poster.jpg                  # Project poster or visualization
+├── .gitignore                  # git ignore for data and other folders/files
 ├── LICENSE                     # License file
 └── README.md                   # Project documentation
+
 ```
 
 ---

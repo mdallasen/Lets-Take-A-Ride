@@ -13,10 +13,6 @@ ENV/
 # Ignore VSCode settings
 .vscode/
 
-# Ignore data files
-data/*.graphml
-data/
-
 # Ignore Jupyter Notebook checkpoints
 .ipynb_checkpoints/
 
